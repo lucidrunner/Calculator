@@ -1,23 +1,19 @@
 ﻿//Main reason not to use top level statements: Can't file-scope namespaces with them :(
-
-using System.Diagnostics;
-
 namespace Calculator;
 
 internal class Program
 {
-
     //Slightly ugly design, but allows us to access the Operators array in switches
+    //As well as iterate over them without being able to change them
     private const char PlusOperator = '+';
     private const char MinusOperator = '-';
     private const char MultiplicationOperator = '*';
     private const char DivisionOperator = '/';
 
-    //As well as iterate over them without being able to change them
     private static char[] SupportedOperators =>
         new[] { PlusOperator, MinusOperator, MultiplicationOperator, DivisionOperator };
 
-    static void Main(string[] args)
+    private static void Main(string[] args)
     {
         //Since we're not gonna do operations on our historical list we can just save it as a series of strings
         List<string> history = new List<string>();
@@ -35,9 +31,9 @@ internal class Program
                 //Input numbers - Basic version = we only deal with 2. I've decided to ask for it as a single string since it's easier to expand later
                 Console.Write("Input your two numbered operation (eg x*y): ");
                 correctInput = ReadInput(out input);
-                
+
                 //If we did not read the input in a correct format, go to the next cycle of the while
-                if(!correctInput)
+                if (!correctInput)
                 {
                     Console.WriteLine("Please provide the input in correct format.");
                     continue;
@@ -50,7 +46,6 @@ internal class Program
                     correctInput = false;
                     Console.WriteLine("We can't divide by zero.");
                 }
-
             } while (!correctInput);
 
             //Now that we have a correct expression split up, it's time to actually calculate the results
@@ -72,12 +67,10 @@ internal class Program
                 }
             }
 
-
             calculatorRunning = PromptForChoice("Restart the Calculator?");
         }
         PrintSign("You are now leaving the Calculator. Goodbye!");
     }
-    
 
     private static double Calculate(ProcessedInput input)
     {
@@ -98,17 +91,16 @@ internal class Program
         //We have to assign a default record to the out argument since we might need to leave early
         //A risk of doing this is that we later miss assigning parts to the record
         processedInput = new ProcessedInput(0, '*', 0);
-        
+
         //Read the input
         string input = Console.ReadLine() ?? "";
-        
+
         //Start by splitting it
         var inputParts = input.Split(SupportedOperators, StringSplitOptions.TrimEntries);
-        
+
         //First fail state - If any parts are empty, or we don't have two parts in our expression we return false
         if (inputParts.Length != 2 && inputParts.Any(string.IsNullOrEmpty))
             return false;
-
         
         //Two hickups from splitting occur - the first is that we eliminate the operator from the parts
         //We use a method to get around this
@@ -120,11 +112,11 @@ internal class Program
         //Second hickup is parsing from the parts to our doubles, which can fail for a number of reasons
         //Solving this by using a double.TryParse as a kind of catch-all
 
-        //Have to initialize these before our passedParse check to avoid confusing the compilator 
+        //Have to initialize these before our passedParse check to avoid confusing the compilator
         double firstNumber = 0, secondNumber = 0;
         bool passedParse = double.TryParse(inputParts[0], out firstNumber) &&
                            double.TryParse(inputParts[1], out secondNumber);
-        
+
         if (!passedParse)
             return false;
 
@@ -134,7 +126,6 @@ internal class Program
         //Finally, return true if we passed all our input checking
         return true;
     }
-
 
     private static char? GetOperator(string input)
     {
@@ -146,7 +137,7 @@ internal class Program
         }
         return null;
     }
-    
+
     /// <summary>
     /// Prompts the Player for yes / no on a selected text
     /// </summary>

@@ -33,3 +33,12 @@ Finns ett par sätt att göra input-sektionen men om man väljer det i sin mest 
 
 Första designmönstret jag kör på helt enkelt att lista det mesta i en huvudklass.  Kommer använda mig av metoder för att bryta upp den större While-loopen
 Expanderingen av detta mönster är att gå från metoder till klasser som hanterar de olika stegen, eftersom man då för en större kontroll över att expandera det ytterligare
+
+Commit 970a385 motsvarar 1.0
+  
+### Version 2
+Aka, vi övergår till klasser, samt vi rör oss bort från bara 2 tal
+Finns 2 primära saker som kan flyttas in i klasser - inputhantering (och då parsing), och uträkning, speciellt då uträkningarna blir mer avancerade
+
+Röra oss bort från 2 tal betyder lite ändringar i just parsingen. Vi kan inte längre anta att vi bara har två tal, och bara en operator. Hellre än att splitta strängen tänker jag gå igenom den i delar mellan varje operator och spara delarna som en ny klass till en lista i ProcessedInput. Denna nya klass ska ha ett enum som bestämmer vilken operator / om det är ett värde, samt ett värdesfält.
+När vi sedan räknar ut så går vi igenom listan baserat på order of operations och ersätter a operation b med det nya värdet c
