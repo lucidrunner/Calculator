@@ -1,16 +1,19 @@
 ﻿//Main reason not to use top level statements: Can't file-scope namespaces with them :(
+
+using System.Text;
+
 namespace Calculator;
 
 internal class Program
 {
     //Slightly ugly design, but allows us to access the Operators array in switches
     //As well as iterate over them without being able to change them
-    private const char PlusOperator = '+';
-    private const char MinusOperator = '-';
-    private const char MultiplicationOperator = '*';
-    private const char DivisionOperator = '/';
+    public const char PlusOperator = '+';
+    public const char MinusOperator = '-';
+    public const char MultiplicationOperator = '*';
+    public const char DivisionOperator = '/';
 
-    private static char[] SupportedOperators =>
+    public static char[] SupportedOperators =>
         new[] { PlusOperator, MinusOperator, MultiplicationOperator, DivisionOperator };
 
     private static void Main(string[] args)
@@ -28,31 +31,39 @@ internal class Program
             //Using a do-while since we always wanna run this a minimum of one time
             do
             {
-                //Input numbers - Basic version = we only deal with 2. I've decided to ask for it as a single string since it's easier to expand later
-                Console.Write("Input your two numbered operation (eg x*y): ");
-                correctInput = ReadInput(out input);
+                string fullInput = Console.ReadLine() ?? "";
+                var parsed = CalculatorInputParser.ParseInput(fullInput);
+                Console.WriteLine(parsed.ToString());
+                Console.WriteLine(parsed.ValidityStatus);
+                correctInput = false;
 
-                //If we did not read the input in a correct format, go to the next cycle of the while
-                if (!correctInput)
-                {
-                    Console.WriteLine("Please provide the input in correct format.");
-                    continue;
-                }
+                ////Input numbers - Basic version = we only deal with 2. I've decided to ask for it as a single string since it's easier to expand later
+                //Console.Write("Input your two numbered operation (eg x*y): ");
+                //correctInput = ReadInput(out input);
 
-                //There is one final validity check we have to do even if we have correct input - division by zero
-                //We could have done this in the reading of the input, but let's keep our responsibilities separate
-                if (input.OperatorSymbol == DivisionOperator && input.SecondInput.Equals(0))
-                {
-                    correctInput = false;
-                    Console.WriteLine("We can't divide by zero.");
-                }
+                ////If we did not read the input in a correct format, go to the next cycle of the while
+                //if (!correctInput)
+                //{
+                //    Console.WriteLine("Please provide the input in correct format.");
+                //    continue;
+                //}
+
+                ////There is one final validity check we have to do even if we have correct input - division by zero
+                ////We could have done this in the reading of the input, but let's keep our responsibilities separate
+                //if (input.OperatorSymbol == DivisionOperator && input.SecondInput.Equals(0))
+                //{
+                //    correctInput = false;
+                //    Console.WriteLine("We can't divide by zero.");
+                //}
             } while (!correctInput);
 
             //Now that we have a correct expression split up, it's time to actually calculate the results
-            double answer = Calculate(input);
+            double answer = 0;
+            //double answer = Calculate(input);
 
-            //And print it
-            string fullAnswer = $"{input} = {answer}";
+            ////And print it
+            //string fullAnswer = $"{input} = {answer}";
+            string fullAnswer = "";
             Console.WriteLine(fullAnswer);
 
             //Finally, we save it to our history list
@@ -75,14 +86,15 @@ internal class Program
     private static double Calculate(ProcessedInput input)
     {
         //When we're dealing with two numbers this part is actually fairly straight forward
-        return input.OperatorSymbol switch
-        {
-            PlusOperator => input.FirstInput + input.SecondInput,
-            MinusOperator => input.SecondInput - input.SecondInput,
-            MultiplicationOperator => input.FirstInput * input.SecondInput,
-            DivisionOperator => input.FirstInput / input.SecondInput,
-            _ => double.NaN
-        };
+        return 0;
+        //return input.OperatorSymbol switch
+        //{
+        //    PlusOperator => input.FirstInput + input.SecondInput,
+        //    MinusOperator => input.SecondInput - input.SecondInput,
+        //    MultiplicationOperator => input.FirstInput * input.SecondInput,
+        //    DivisionOperator => input.FirstInput / input.SecondInput,
+        //    _ => double.NaN
+        //};
     }
 
     private static bool ReadInput(out ProcessedInput processedInput)
@@ -90,7 +102,7 @@ internal class Program
         //One negative part about the pattern I did in this method
         //We have to assign a default record to the out argument since we might need to leave early
         //A risk of doing this is that we later miss assigning parts to the record
-        processedInput = new ProcessedInput(0, '*', 0);
+        processedInput = new ProcessedInput();
 
         //Read the input
         string input = Console.ReadLine() ?? "";
@@ -120,8 +132,8 @@ internal class Program
         if (!passedParse)
             return false;
 
-        //Before exiting, remember to create our correct record
-        processedInput = new ProcessedInput(firstNumber, mathOperator.Value, secondNumber);
+        ////Before exiting, remember to create our correct record
+        //processedInput = new ProcessedInput(firstNumber, mathOperator.Value, secondNumber);
 
         //Finally, return true if we passed all our input checking
         return true;
@@ -145,6 +157,7 @@ internal class Program
     /// <returns>True if the player answers y</returns>
     private static bool PromptForChoice(string promptText)
     {
+        
         //Nothing too fancy, we ask for the response and returns true if it's yes
         string playerResponse = "";
         //ToLower so we don't have to deal with Yy and Nn differences
@@ -175,15 +188,5 @@ internal class Program
         Console.WriteLine($"{signCharacter} {signText} {signCharacter}");
         Console.WriteLine(signEdge);
         Console.WriteLine();
-    }
-}
-
-//Record for our input, split into parts and the operator
-//Slightly breaking my Part 1 rule here by using a record, but prefer them over tuples
-internal record ProcessedInput(double FirstInput, char OperatorSymbol, double SecondInput)
-{
-    public override string ToString()
-    {
-        return $"{FirstInput}{OperatorSymbol}{SecondInput}";
     }
 }
