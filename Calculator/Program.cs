@@ -27,34 +27,20 @@ internal class Program
         while (calculatorRunning)
         {
             bool correctInput = true;
-            ProcessedInput input;
+            ProcessedInput parsedInput;
             //Using a do-while since we always wanna run this a minimum of one time
             do
             {
-                string fullInput = Console.ReadLine() ?? "";
-                var parsed = CalculatorInputParser.ParseInput(fullInput);
-                Console.WriteLine(parsed.ToString());
-                Console.WriteLine(parsed.ValidityStatus);
-                correctInput = false;
+                Console.Write("Input your expression: ");
+                string input = Console.ReadLine() ?? "";
+                parsedInput = CalculatorInputParser.ParseInput(input);
 
-                ////Input numbers - Basic version = we only deal with 2. I've decided to ask for it as a single string since it's easier to expand later
-                //Console.Write("Input your two numbered operation (eg x*y): ");
-                //correctInput = ReadInput(out input);
-
-                ////If we did not read the input in a correct format, go to the next cycle of the while
-                //if (!correctInput)
-                //{
-                //    Console.WriteLine("Please provide the input in correct format.");
-                //    continue;
-                //}
-
-                ////There is one final validity check we have to do even if we have correct input - division by zero
-                ////We could have done this in the reading of the input, but let's keep our responsibilities separate
-                //if (input.OperatorSymbol == DivisionOperator && input.SecondInput.Equals(0))
-                //{
-                //    correctInput = false;
-                //    Console.WriteLine("We can't divide by zero.");
-                //}
+                if (parsedInput.ValidityStatus != ProcessedInput.Validity.Valid)
+                {
+                    correctInput = false;
+                    PrintValidityError(parsedInput);
+                }
+                
             } while (!correctInput);
 
             //Now that we have a correct expression split up, it's time to actually calculate the results
@@ -81,6 +67,29 @@ internal class Program
             calculatorRunning = PromptForChoice("Restart the Calculator?");
         }
         PrintSign("You are now leaving the Calculator. Goodbye!");
+    }
+
+    private static void PrintValidityError(ProcessedInput correctInput)
+    {
+        Console.WriteLine("Input error:");
+        switch (correctInput.ValidityStatus)
+        {
+            case ProcessedInput.Validity.ParseError:
+                Console.WriteLine("Incorrect format of the entered values.");
+                break;
+            case ProcessedInput.Validity.OrderError:
+                Console.WriteLine("Confusing operator order.");
+                break;
+            case ProcessedInput.Validity.DivisionByZeroError:
+                Console.WriteLine("No dividing by zero.");
+                break;
+            case ProcessedInput.Validity.TooShortError:
+                Console.WriteLine("The entered expression was too short.");
+                break;
+            default:
+                Console.WriteLine("Unknown Input Error.");
+                break;
+        }
     }
 
     private static double Calculate(ProcessedInput input)

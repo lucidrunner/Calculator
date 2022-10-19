@@ -83,7 +83,6 @@ public class ProcessedInput
 
     public void AddComponent(ExpressionComponent component)
     {
-        Console.WriteLine("Adding component " + component);
         _processedComponents.Add(component);
         Validate();
     }
