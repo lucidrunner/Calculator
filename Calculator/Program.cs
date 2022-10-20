@@ -1,8 +1,4 @@
-﻿//Main reason not to use top level statements: Can't file-scope namespaces with them :(
-
-using System.Text;
-
-namespace Calculator;
+﻿namespace Calculator;
 
 internal class Program
 {
@@ -13,8 +9,15 @@ internal class Program
     public const char MultiplicationOperator = '*';
     public const char DivisionOperator = '/';
 
+    //Want to be able to iterate through the operators so need to have them in some sort of collection at least
     public static char[] SupportedOperators =>
-        new[] { PlusOperator, MinusOperator, MultiplicationOperator, DivisionOperator };
+        new[] { MultiplicationOperator, DivisionOperator, PlusOperator, MinusOperator };
+    
+    //Since multiplication and division, and plus and minus have the same priority we also create a multi-dimensional
+    //array defining the steps of the order of operations
+    public static List<char[]> OrderOfOperations =>
+        new() { new []{ MultiplicationOperator, DivisionOperator }, new []{ PlusOperator, MinusOperator } };
+
 
     private static void Main(string[] args)
     {
@@ -28,13 +31,17 @@ internal class Program
         {
             bool correctInput = true;
             ProcessedInput parsedInput;
+
             //Using a do-while since we always wanna run this a minimum of one time
             do
             {
+                //Ask and record the input
                 Console.Write("Input your expression: ");
                 string input = Console.ReadLine() ?? "";
+                //Send it to our parser and get a parsed version back
                 parsedInput = CalculatorInputParser.ParseInput(input);
 
+                //If the parsed version is not in a valid state, repeat the while and print why it failed
                 if (parsedInput.ValidityStatus != ProcessedInput.Validity.Valid)
                 {
                     correctInput = false;
@@ -42,14 +49,13 @@ internal class Program
                 }
                 
             } while (!correctInput);
+            
 
             //Now that we have a correct expression split up, it's time to actually calculate the results
-            double answer = 0;
-            //double answer = Calculate(input);
-
-            ////And print it
-            //string fullAnswer = $"{input} = {answer}";
-            string fullAnswer = "";
+            double answer = ExpressionCalculator.Calculate(parsedInput);
+            Console.WriteLine(answer);
+            
+            string fullAnswer = $"{parsedInput} = {answer}";
             Console.WriteLine(fullAnswer);
 
             //Finally, we save it to our history list
@@ -91,74 +97,7 @@ internal class Program
                 break;
         }
     }
-
-    private static double Calculate(ProcessedInput input)
-    {
-        //When we're dealing with two numbers this part is actually fairly straight forward
-        return 0;
-        //return input.OperatorSymbol switch
-        //{
-        //    PlusOperator => input.FirstInput + input.SecondInput,
-        //    MinusOperator => input.SecondInput - input.SecondInput,
-        //    MultiplicationOperator => input.FirstInput * input.SecondInput,
-        //    DivisionOperator => input.FirstInput / input.SecondInput,
-        //    _ => double.NaN
-        //};
-    }
-
-    private static bool ReadInput(out ProcessedInput processedInput)
-    {
-        //One negative part about the pattern I did in this method
-        //We have to assign a default record to the out argument since we might need to leave early
-        //A risk of doing this is that we later miss assigning parts to the record
-        processedInput = new ProcessedInput();
-
-        //Read the input
-        string input = Console.ReadLine() ?? "";
-
-        //Start by splitting it
-        var inputParts = input.Split(SupportedOperators, StringSplitOptions.TrimEntries);
-
-        //First fail state - If any parts are empty, or we don't have two parts in our expression we return false
-        if (inputParts.Length != 2 && inputParts.Any(string.IsNullOrEmpty))
-            return false;
-        
-        //Two hickups from splitting occur - the first is that we eliminate the operator from the parts
-        //We use a method to get around this
-        char? mathOperator = GetOperator(input);
-        //If the operator was incorrect, return false
-        if (!mathOperator.HasValue)
-            return false;
-
-        //Second hickup is parsing from the parts to our doubles, which can fail for a number of reasons
-        //Solving this by using a double.TryParse as a kind of catch-all
-
-        //Have to initialize these before our passedParse check to avoid confusing the compilator
-        double firstNumber = 0, secondNumber = 0;
-        bool passedParse = double.TryParse(inputParts[0], out firstNumber) &&
-                           double.TryParse(inputParts[1], out secondNumber);
-
-        if (!passedParse)
-            return false;
-
-        ////Before exiting, remember to create our correct record
-        //processedInput = new ProcessedInput(firstNumber, mathOperator.Value, secondNumber);
-
-        //Finally, return true if we passed all our input checking
-        return true;
-    }
-
-    private static char? GetOperator(string input)
-    {
-        //Fairly straight forward since we're only dealing with one operator - go through our allowed operators and see which fits
-        foreach (char supportedOperator in SupportedOperators)
-        {
-            if (input.Contains(supportedOperator))
-                return supportedOperator;
-        }
-        return null;
-    }
-
+    
     /// <summary>
     /// Prompts the Player for yes / no on a selected text
     /// </summary>
@@ -198,4 +137,6 @@ internal class Program
         Console.WriteLine(signEdge);
         Console.WriteLine();
     }
+
+    
 }
