@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Text;
+﻿using System.Text;
 
 namespace Calculator;
 
@@ -11,15 +10,12 @@ public static class CalculatorInputParser
     
     public static ProcessedInput ParseInput(string input)
     {
-        
         ProcessedInput processedInput = new ProcessedInput();
 
         //Trim any operator signs that are at the start or end of the input string, since these will be disregarded anyway
         input = input.Trim(Program.SupportedOperators);
 
-        //Safety so we don't get stuck in this 
-        int currentIterations = 0;
-        
+
 
         //Go through the string, taking chunks off it until we don't have any operators left
         while (input.Length > 0)
@@ -63,7 +59,6 @@ public static class CalculatorInputParser
             if (index >= 0 && (index < nextIndex || nextIndex < 0))
                 nextIndex = index;
         }
-
         return nextIndex;
     }
 }
@@ -144,7 +139,6 @@ public class ProcessedInput
 
         //Otherwise, we're valid
         _validity = Validity.Valid;
-
     }
 
     public override string ToString()

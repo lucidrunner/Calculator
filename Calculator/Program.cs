@@ -36,7 +36,7 @@ internal class Program
             do
             {
                 //Ask and record the input
-                Console.Write("Input your expression: ");
+                Console.Write("Input your calculation: ");
                 string input = Console.ReadLine() ?? "";
                 //Send it to our parser and get a parsed version back
                 parsedInput = CalculatorInputParser.ParseInput(input);
@@ -47,14 +47,13 @@ internal class Program
                     correctInput = false;
                     PrintValidityError(parsedInput);
                 }
-                
             } while (!correctInput);
             
 
             //Now that we have a correct expression split up, it's time to actually calculate the results
             double answer = ExpressionCalculator.Calculate(parsedInput);
-            Console.WriteLine(answer);
             
+            //Then we construct our full answer
             string fullAnswer = $"{parsedInput} = {answer}";
             Console.WriteLine(fullAnswer);
 
@@ -70,15 +69,20 @@ internal class Program
                 }
             }
 
+            //Ask if they want to restart, and if no then set our running to false
             calculatorRunning = PromptForChoice("Restart the Calculator?");
         }
+
         PrintSign("You are now leaving the Calculator. Goodbye!");
     }
 
-    private static void PrintValidityError(ProcessedInput correctInput)
+    /// <summary>
+    /// Prints different console messages based on the error state of the passed in input
+    /// </summary>
+    private static void PrintValidityError(ProcessedInput input)
     {
-        Console.WriteLine("Input error:");
-        switch (correctInput.ValidityStatus)
+        Console.Write("Input error:");
+        switch (input.ValidityStatus)
         {
             case ProcessedInput.Validity.ParseError:
                 Console.WriteLine("Incorrect format of the entered values.");
