@@ -21,6 +21,8 @@ internal class Program
 
     private static void Main(string[] args)
     {
+        
+
         //Since we're not gonna do operations on our history list we can just save it as a series of strings
         List<string> history = new List<string>();
         
@@ -42,8 +44,6 @@ internal class Program
 
                 //Send it to our parser and get a parsed version back
                 parsedInput = CalculatorInputParser.ParseInput(input);
-
-                Console.WriteLine(parsedInput.ValidityStatus);
 
                 //If the parsed version is not in a valid state, print why and repeat input
                 if (parsedInput.ValidityStatus != MathematicalExpression.Validity.Valid)
@@ -117,7 +117,6 @@ internal class Program
     /// <returns>True if the player answers y</returns>
     private static bool PromptForChoice(string promptText)
     {
-        
         //Nothing too fancy, we ask for the response and returns true if it's yes
         string playerResponse = "";
         //ToLower so we don't have to deal with Yy and Nn differences
@@ -125,7 +124,8 @@ internal class Program
         {
             Console.Write($"{promptText} [y/n]: ");
             //?? so we don't have to worry about null
-            playerResponse = Console.ReadLine() ?? "";
+            playerResponse = Console.ReadKey().KeyChar.ToString().ToLower();
+            Console.WriteLine();
         }
 
         return playerResponse.ToLower() == "y";
