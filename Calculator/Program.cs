@@ -33,6 +33,8 @@ internal class Program
         
         //Display our welcome message
         PrintSign("Welcome to the Calculator!");
+        //Quick Help Message
+        Console.WriteLine("I can handle most simple left to right expressions of any length as long as my format is not too messed up. For example try entering: 5+2,4*3/2*2-1+5*-1");
 
         bool calculatorRunning = true;
         while (calculatorRunning)

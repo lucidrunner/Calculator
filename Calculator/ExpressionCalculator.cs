@@ -10,7 +10,9 @@
 /// </summary>
 public static class ExpressionCalculator
 {
-    
+    //TODO Set to True to show the steps taken by the calculator
+    private const bool ShowSteps = false;
+
     /// <summary>
     /// Goes through and calculates the value of the passed in Expression based on the order of operations defined by Program.OrderOfOperations
     /// </summary>
@@ -53,8 +55,8 @@ public static class ExpressionCalculator
                 double calculatedValue = Calculate(firstValue, secondValue, workedInput[inputIndex].Value);
                 ExpressionComponent calculatedComponent = new(calculatedValue.ToString(), ExpressionType.Value);
 
-                //Uncomment to show result of the calculation
-                //Console.Write($"({calculatedValue})\n");
+                if(ShowSteps)
+                    Console.Write($"({calculatedValue})\n");
 
                 //Now that we have a new component, it's time to swap the 3 components that created it (first value, second value and 
                 workedInput.Insert(inputIndex - 1, calculatedComponent);
@@ -82,14 +84,15 @@ public static class ExpressionCalculator
     /// <returns>The calculated value if the operator is valid, otherwise NaN</returns>
     public static double Calculate(double firstValue, double secondValue, string operatorSign)
     {
-        //Uncomment to show the steps of the calculation
-        //Console.Write($"Calculating {firstValue} {operatorSign} {secondValue} ");
+        if(ShowSteps)
+            Console.Write($"Calculating {firstValue} {operatorSign} {secondValue} ");
 
         //Not a fan of these if-checks but prefer Contains over Equals
+        //Since doubles aren't perfect we also need to round a bit
         if (operatorSign.Contains(Program.MultiplicationOperator))
-            return firstValue * secondValue;
+            return Math.Round(firstValue * secondValue, 5);
         if (operatorSign.Contains(Program.DivisionOperator))
-            return firstValue / secondValue;
+            return Math.Round(firstValue / secondValue, 5);
         if (operatorSign.Contains(Program.PlusOperator))
             return firstValue + secondValue;
         if (operatorSign.Contains(Program.MinusOperator))
