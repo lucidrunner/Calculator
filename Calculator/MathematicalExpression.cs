@@ -105,7 +105,7 @@ public class MathematicalExpression
             if (!_processedComponents[index].Value.Contains(Program.DivisionOperator))
                 continue;
 
-            //Otherwise, if the preceding value is 0, we're invalid
+            //Otherwise, if the next value is 0, we're invalid
             double.TryParse(_processedComponents[index + 1].Value, out double value);
             if (value.Equals(0))
             {

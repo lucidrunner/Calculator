@@ -30,7 +30,7 @@ public static class CalculatorInputParser
                 nextIndex = input.Length;
 
             //Add the value part (aka, the input up to the next operator) to the processed input
-            string value = input.Substring(0, nextIndex);
+            string value = input.Substring(0,nextIndex);
             if (value.Length > 0)
             {
                 inputExpression.Append(new ExpressionComponent(value, ExpressionType.Value));
