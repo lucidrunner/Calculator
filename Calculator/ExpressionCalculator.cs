@@ -3,6 +3,8 @@
 //TODO Same note as for the InputParser, mostly just using a static class here to group some methods together
 //One note of improvement here - the class makes some assumptions about the values it gets and just parses them directly. A more futureproof way would be TryParse and return NaN if
 //they fail
+//TODO - Second note of improvement, I originally used doubles for my calculations. At the end I ran into rounding errors due to this. I'm not too familiar with decimals but might
+//have been worth experimenting with at least.
 
 
 /// <summary>
@@ -86,17 +88,18 @@ public static class ExpressionCalculator
     {
         if(ShowSteps)
             Console.Write($"Calculating {firstValue} {operatorSign} {secondValue} ");
+        
 
         //Not a fan of these if-checks but prefer Contains over Equals
         //Since doubles aren't perfect we also need to round a bit
         if (operatorSign.Contains(Program.MultiplicationOperator))
-            return Math.Round(firstValue * secondValue, 5);
+            return Math.Round(firstValue * secondValue, 7);
         if (operatorSign.Contains(Program.DivisionOperator))
-            return Math.Round(firstValue / secondValue, 5);
+            return Math.Round(firstValue / secondValue, 7);
         if (operatorSign.Contains(Program.PlusOperator))
-            return firstValue + secondValue;
+            return Math.Round(firstValue + secondValue, 7);
         if (operatorSign.Contains(Program.MinusOperator))
-            return firstValue - secondValue;
+            return Math.Round(firstValue - secondValue, 7);
 
 
         return double.NaN;

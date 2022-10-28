@@ -76,10 +76,12 @@ internal class Program
             //After that, prompt to display the history list and if yes, do so
             if (PromptForChoice("Display the Calculator history?"))
             {
+                Console.WriteLine("--History------");
                 foreach (string calculation in history)
                 {
-                    Console.WriteLine(calculation);
+                    Console.WriteLine($"  {calculation}");
                 }
+                Console.WriteLine();
             }
 
             //Ask if they want to restart, and if no then set our running to false
