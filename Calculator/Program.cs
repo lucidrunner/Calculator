@@ -1,9 +1,16 @@
 ﻿namespace Calculator;
 
+/*TODO Wrote this in the README too but using these TODO-blocks in the start of each file to add some extra thoughts regarding the current design
+ One thing stand out in this - as an entry point Program / Main is doing too much and should really instead instantiate a calculator class that runs the show
+The reason I'm not doing that (and also the reason the console "GUI" looks the way it does) is because I kinda made it a goal not to deviate too far from the provided pseudo-code
+Some improvements to the UI would be a menu (Do Math, Help, View History, Exit etc) instead of the current math->history->reset/exit flow. 
+The problem with the flow is especially apparent during input because I also wanted to add invalidly entered expressions into the history-list, 
+and if I wanted to have the possibility to show the list after that I'd have to do some refactoring
+*/
 internal class Program
 {
     //Slightly ugly design, but allows us to access the Operators array in switches
-    //As well as iterate over them without being able to change them
+    //As well as iterate over them without being able to accidentally change them
     public const char PlusOperator = '+';
     public const char MinusOperator = '-';
     public const char MultiplicationOperator = '*';
@@ -21,8 +28,6 @@ internal class Program
 
     private static void Main(string[] args)
     {
-        
-
         //Since we're not gonna do operations on our history list we can just save it as a series of strings
         List<string> history = new List<string>();
         
@@ -117,6 +122,8 @@ internal class Program
     /// <returns>True if the player answers y</returns>
     private static bool PromptForChoice(string promptText)
     {
+        //Since I converted this from a previous ReadLine I'm still doing string comparisons for input. A clearer version would directly check .Key instead
+
         //Nothing too fancy, we ask for the response and returns true if it's yes
         string playerResponse = "";
         //ToLower so we don't have to deal with Yy and Nn differences

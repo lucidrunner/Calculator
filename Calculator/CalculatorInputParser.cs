@@ -1,7 +1,10 @@
 ﻿namespace Calculator;
 
+//TODO Rather straightforward. Using classes to simply group methods here. The first change I'd do if I wanted to create a more advanced calculator was make all of these
+//instantiated and implementing interfaces so I could switch them out. Currently all these classes are very tightly linked.
+
 /// <summary>
-/// Supports operations to convert a mathematical string expression (ie 2*5+2) to a 
+/// Supports operations to convert a mathematical string expression (eg. 2*5+2) to a MathematicalExpression
 /// </summary>
 public static class CalculatorInputParser
 {
@@ -9,7 +12,7 @@ public static class CalculatorInputParser
     /// Parses a provided string into operators and values and builds an expression based on them
     /// </summary>
     /// <param name="input">The string that should represent a mathematical expression (eg. 5*2+1).</param>
-    /// <returns>The MathematicalExpression built from the parts, can be marked as invalid for several reasons.</returns>
+    /// <returns>The MathematicalExpression built from the parts, will be marked as invalid if it's not solvable.</returns>
     public static MathematicalExpression ParseInput(string input)
     {
         MathematicalExpression inputExpression = new MathematicalExpression();

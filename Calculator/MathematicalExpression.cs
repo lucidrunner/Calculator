@@ -1,9 +1,11 @@
 ﻿using System.Text;
-
 namespace Calculator;
 
+//TODO Think I'm explaining most of my though process in this in the comments. Went for a simple builder pattern because I wanted to be able to treat
+//the expression as a series of and perform validation when I added components into it. Worked out well since it also allowed me to easily handle negative numbers later.
+
 /// <summary>
-/// 
+/// Simple builder class for Mathematical Expressions which provides the ability to add values and operators in order as well as validation.
 /// </summary>
 public class MathematicalExpression
 {
@@ -71,10 +73,9 @@ public class MathematicalExpression
 
     public void Validate()
     {
-
-        //3 main cases of invalid input
+        //4 main cases of invalid input
         //First is if any of our value tagged components aren't parseable
-        //Could do this as a lambda but keeping it simpler
+        //Could do this as a lambda but keeping it a bit clearer via foreach and if-checks
         foreach (ExpressionComponent component in _processedComponents)
         {
             if (component.Type == ExpressionType.Value && !double.TryParse(component.Value, out _))
@@ -87,13 +88,13 @@ public class MathematicalExpression
         //Second is if we're not alternating between values and operators OR if our first component is an operator
         for (int index = 0; index < _processedComponents.Count - 1; index++)
         {
+            //Handling our special case where the first index is an operator
             if (index == 0 && _processedComponents[index].Type == ExpressionType.Operator)
                 _validity = Validity.OrderError;
-
-            //If the next input is different, skip forward
+            //Otherwise - if the next input is a different type, skip forward since we're still valid
             else if (_processedComponents[index].Type != _processedComponents[index + 1].Type) continue;
             
-            //Otherwise, order error
+            //If we've not continued, we're at an order error due to index & index + 1 having the same type
             _validity = Validity.OrderError;
             return;
         }
@@ -114,7 +115,7 @@ public class MathematicalExpression
             }
         }
 
-        //Fourth is pretty simple, we're just too short to be valid
+        //Fourth is pretty simple, we're just too short to be a valid expression (minimum x + y in size) 
         if (_processedComponents.Count < 3)
         {
             _validity = Validity.TooShortError;
@@ -131,15 +132,23 @@ public class MathematicalExpression
         foreach (var component in _processedComponents)
         {
             returnString.Append(component.Value);
-            returnString.Append(' ');
+            returnString.Append(' '); //Comment this row to get the expression without spaces between each component
         }
 
         return returnString.ToString();
     }
 }
 
-public record ExpressionComponent(string Value, ExpressionType Type) { }
+/// <summary>
+/// The smaller single component used to build a larger mathematical expressions
+/// </summary>
+/// <param name="Value">The string representation of the component, originally either a double or a char.</param>
+/// <param name="Type">Tells us if the component represents a value or an operator.</param>
+public record ExpressionComponent(string Value, ExpressionType Type);
 
+/// <summary>
+/// Denotes if a value is either a pure value (eg. 6.2) or an operator (eg. */+-)
+/// </summary>
 public enum ExpressionType
 {
     Operator, Value

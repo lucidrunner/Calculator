@@ -1,27 +1,36 @@
 ﻿namespace Calculator;
 
+//TODO Same note as for the InputParser, mostly just using a static class here to group some methods together
+//One note of improvement here - the class makes some assumptions about the values it gets and just parses them directly. A more futureproof way would be TryParse and return NaN if
+//they fail
+
 
 /// <summary>
-/// 
+/// Provides methods for calculating different levels of mathematical expressions.
 /// </summary>
 public static class ExpressionCalculator
 {
+    
+    /// <summary>
+    /// Goes through and calculates the value of the passed in Expression based on the order of operations defined by Program.OrderOfOperations
+    /// </summary>
+    /// <returns>The calculated value of all the expression components, or double.NaN if the expression is invalid.</returns>
     public static double Calculate(MathematicalExpression input)
     {
-        //Some error checking, return if we've not sent in a valid input
+        //If we know we have an invalid expression, return immediately
         if (input.ValidityStatus != MathematicalExpression.Validity.Valid)
             return double.NaN;
 
         //Create a local copy of the input
         var workedInput = input.ProcessedComponents;
 
-        /*Go through the input based on the order of operations
+        /*Go through the input based on the order of operations and solve it in parts
          ------------------------------------
         Originally I did this by using the SupportedOperators array
         Now I use a list of arrays, since it can be ambiguous if * or /, + or - should be done first.
         Doing it with the SupportedOperators array would have meant that we'd be forced to do division first, since otherwise multiplication might have left
         us with a risk to divide by 0 (example: 2 / 5 * 0 would result in 2 / 0 if multiplication is done first)
-        Going left to right and checking multiple operators at once evades that while keeping the ambiguity
+        Going left to right and checking multiple operators at once evades that while keeping the ambiguity present in the order of operations
          ------------------------------------
         */
         foreach (char[] operators in Program.OrderOfOperations)
@@ -33,11 +42,11 @@ public static class ExpressionCalculator
                       operators.Any(n => workedInput[inputIndex].Value.Contains(n))))
                     continue;
 
-                //Same if we're on the first or last value, although this should not happen with current parser
+                //Same if we're on the first or last value, although this should not happen with the current parser
                 if (inputIndex == 0 || inputIndex == workedInput.Count - 1)
                     continue;
 
-                //Otherwise, create a new expression based on the value before and after our parse
+                //Otherwise, create a new expression based on the value before and after our current component
                 //Since one of our validity-checks is that all values are parseable, we don't need to worry about parse errors here
                 double firstValue = double.Parse(workedInput[inputIndex - 1].Value);
                 double secondValue = double.Parse(workedInput[inputIndex + 1].Value);
@@ -45,7 +54,7 @@ public static class ExpressionCalculator
                 ExpressionComponent calculatedComponent = new(calculatedValue.ToString(), ExpressionType.Value);
 
                 //Uncomment to show result of the calculation
-                Console.Write($"({calculatedValue})\n");
+                //Console.Write($"({calculatedValue})\n");
 
                 //Now that we have a new component, it's time to swap the 3 components that created it (first value, second value and 
                 workedInput.Insert(inputIndex - 1, calculatedComponent);
@@ -56,8 +65,12 @@ public static class ExpressionCalculator
             }
         }
 
-        //Parse the sole remaining value to our double result
-        return double.Parse(workedInput[0].Value);
+        //Parse the sole remaining value to our result
+        //Catch all error handling at the end, if we make some changes to MathematicalExpression down the line this returns NaN rather than crashes
+        if (workedInput.Count > 0 && double.TryParse(workedInput[0].Value, out double result))
+            return result;
+
+        return double.NaN;
     }
 
     /// <summary>
@@ -70,7 +83,7 @@ public static class ExpressionCalculator
     public static double Calculate(double firstValue, double secondValue, string operatorSign)
     {
         //Uncomment to show the steps of the calculation
-        Console.Write($"Calculating {firstValue} {operatorSign} {secondValue} ");
+        //Console.Write($"Calculating {firstValue} {operatorSign} {secondValue} ");
 
         //Not a fan of these if-checks but prefer Contains over Equals
         if (operatorSign.Contains(Program.MultiplicationOperator))

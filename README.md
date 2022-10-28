@@ -1,6 +1,12 @@
 # Calculator
 Slutprojekt Programmering Grund
 
+## Note om Readme  
+Sparar all text under, använde readme-ursprungligen för att dokumentera mina tankegångar under arbetets gång.  
+(Har skrivit det här i Program också) Använder TODO i koden för att highlighta lite extra analys och utvärderings-tankar
+
+
+
 ## tldr bigger plan
 Start with simple calc, only following the basic interpretation of the requirements  
 Then do slightly more advanced version last week  
@@ -34,7 +40,7 @@ Finns ett par sätt att göra input-sektionen men om man väljer det i sin mest 
 Första designmönstret jag kör på helt enkelt att lista det mesta i en huvudklass.  Kommer använda mig av metoder för att bryta upp den större While-loopen
 Expanderingen av detta mönster är att gå från metoder till klasser som hanterar de olika stegen, eftersom man då för en större kontroll över att expandera det ytterligare
 
-Commit 970a385 motsvarar 1.0
+### Commit 970a385 motsvarar 1.0
   
 ### Version 2
 Aka, vi övergår till klasser, samt vi rör oss bort från bara 2 tal
