@@ -14,38 +14,44 @@ internal class Program
         new[] { MultiplicationOperator, DivisionOperator, PlusOperator, MinusOperator };
     
     //Since multiplication and division, and plus and minus have the same priority we also create a multi-dimensional
-    //array defining the steps of the order of operations
+    //array defining the steps of the order of operations (shoutout to Tau for idea)
     public static List<char[]> OrderOfOperations =>
         new() { new []{ MultiplicationOperator, DivisionOperator }, new []{ PlusOperator, MinusOperator } };
 
 
     private static void Main(string[] args)
     {
-        //Since we're not gonna do operations on our historical list we can just save it as a series of strings
+        //Since we're not gonna do operations on our history list we can just save it as a series of strings
         List<string> history = new List<string>();
-
+        
         //Display our welcome message
         PrintSign("Welcome to the Calculator!");
+
         bool calculatorRunning = true;
         while (calculatorRunning)
         {
-            bool correctInput = true;
-            ProcessedInput parsedInput;
 
-            //Using a do-while since we always wanna run this a minimum of one time
+            //Input
+            bool correctInput = true;
+            MathematicalExpression parsedInput;
             do
             {
-                //Ask and record the input
+                correctInput = true;
                 Console.Write("Input your calculation: ");
                 string input = Console.ReadLine() ?? "";
+
                 //Send it to our parser and get a parsed version back
                 parsedInput = CalculatorInputParser.ParseInput(input);
 
-                //If the parsed version is not in a valid state, repeat the while and print why it failed
-                if (parsedInput.ValidityStatus != ProcessedInput.Validity.Valid)
+                Console.WriteLine(parsedInput.ValidityStatus);
+
+                //If the parsed version is not in a valid state, print why and repeat input
+                if (parsedInput.ValidityStatus != MathematicalExpression.Validity.Valid)
                 {
                     correctInput = false;
                     PrintValidityError(parsedInput);
+                    //I'm still adding it to the history-list though, which is why I needed to refactor Print to both Print & Get error message
+                    history.Add($"{parsedInput} = {GetValidityErrorMessage(parsedInput)}");
                 }
             } while (!correctInput);
             
@@ -77,28 +83,30 @@ internal class Program
     }
 
     /// <summary>
-    /// Prints different console messages based on the error state of the passed in input
+    /// Prints different console messages based on the error state of the passed in MathematicalExpression
     /// </summary>
-    private static void PrintValidityError(ProcessedInput input)
+    private static void PrintValidityError(MathematicalExpression input)
     {
-        Console.Write("Input error:");
+        Console.WriteLine($"Input error: {GetValidityErrorMessage(input)}");
+    }
+
+    /// <summary>
+    /// Returns an error message based on the error state of the passed in MathematicalExpression
+    /// </summary>
+    private static string GetValidityErrorMessage(MathematicalExpression input)
+    {
         switch (input.ValidityStatus)
         {
-            case ProcessedInput.Validity.ParseError:
-                Console.WriteLine("Incorrect format of the entered values.");
-                break;
-            case ProcessedInput.Validity.OrderError:
-                Console.WriteLine("Confusing operator order.");
-                break;
-            case ProcessedInput.Validity.DivisionByZeroError:
-                Console.WriteLine("No dividing by zero.");
-                break;
-            case ProcessedInput.Validity.TooShortError:
-                Console.WriteLine("The entered expression was too short.");
-                break;
+            case MathematicalExpression.Validity.ParseError:
+                return "Incorrect format of the entered values.";
+            case MathematicalExpression.Validity.OrderError:
+                return "Confusing operator order.";
+            case MathematicalExpression.Validity.DivisionByZeroError:
+                return "No dividing by zero.";
+            case MathematicalExpression.Validity.TooShortError:
+                return "The entered expression was too short.";
             default:
-                Console.WriteLine("Unknown Input Error.");
-                break;
+                return "Unknown Input Error.";
         }
     }
     

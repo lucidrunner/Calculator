@@ -1,27 +1,26 @@
-﻿using System.Linq;
-
-namespace Calculator;
+﻿namespace Calculator;
 
 
 /// <summary>
-/// Calculates passed in expressions
+/// 
 /// </summary>
 public static class ExpressionCalculator
 {
-    public static double Calculate(ProcessedInput input)
+    public static double Calculate(MathematicalExpression input)
     {
         //Some error checking, return if we've not sent in a valid input
-        if (input.ValidityStatus != ProcessedInput.Validity.Valid)
+        if (input.ValidityStatus != MathematicalExpression.Validity.Valid)
             return double.NaN;
 
         //Create a local copy of the input
         var workedInput = input.ProcessedComponents;
+
         /*Go through the input based on the order of operations
          ------------------------------------
         Originally I did this by using the SupportedOperators array
         Now I use a list of arrays, since it can be ambiguous if * or /, + or - should be done first.
         Doing it with the SupportedOperators array would have meant that we'd be forced to do division first, since otherwise multiplication might have left
-        us with a risk to divide by 0
+        us with a risk to divide by 0 (example: 2 / 5 * 0 would result in 2 / 0 if multiplication is done first)
         Going left to right and checking multiple operators at once evades that while keeping the ambiguity
          ------------------------------------
         */
@@ -45,15 +44,19 @@ public static class ExpressionCalculator
                 double calculatedValue = Calculate(firstValue, secondValue, workedInput[inputIndex].Value);
                 ExpressionComponent calculatedComponent = new(calculatedValue.ToString(), ExpressionType.Value);
 
-                //Now that we have a new component, it's time to swap the 3 components that 
+                //Uncomment to show result of the calculation
+                Console.Write($"({calculatedValue})\n");
+
+                //Now that we have a new component, it's time to swap the 3 components that created it (first value, second value and 
                 workedInput.Insert(inputIndex - 1, calculatedComponent);
                 workedInput.RemoveRange(inputIndex, 3);
 
-                //This is a lot slower, but just to be safe I reset the inputIndex to 0. 
+                //This is slower but just to be safe I reset the inputIndex to 0 rather than just doing -- on it
                 inputIndex = 0;
             }
         }
 
+        //Parse the sole remaining value to our double result
         return double.Parse(workedInput[0].Value);
     }
 
@@ -67,7 +70,7 @@ public static class ExpressionCalculator
     public static double Calculate(double firstValue, double secondValue, string operatorSign)
     {
         //Uncomment to show the steps of the calculation
-        //Console.WriteLine($"Calculating {firstValue} {operatorSign} {secondValue}");
+        Console.Write($"Calculating {firstValue} {operatorSign} {secondValue} ");
 
         //Not a fan of these if-checks but prefer Contains over Equals
         if (operatorSign.Contains(Program.MultiplicationOperator))
@@ -78,6 +81,7 @@ public static class ExpressionCalculator
             return firstValue + secondValue;
         if (operatorSign.Contains(Program.MinusOperator))
             return firstValue - secondValue;
+
 
         return double.NaN;
     }
